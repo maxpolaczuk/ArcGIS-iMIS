@@ -1,37 +1,77 @@
-## Welcome to GitHub Pages
+# Sending emails via a map in iMIS
 
-You can use the [editor on GitHub](https://github.com/maxpolaczuk/Open-HortNZ/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This iPart uses the ArcGIS Javascript API to initiate an email to a selected region of contacts on an interactive map.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+![GEOLOCATION](https://media.giphy.com/media/xUA7aVDcAMWYZoKHEQ/giphy.gif)
 
-### Markdown
+## Purpose
+This tool was created to easily contact groups of growers by email for targeted communications. This provides custom access to growers, on demand.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Stage 1: As a web page
+The first iteration is a standalone HTML page that plots given coordinates, and a user can draw an area onto the map interface. An email can then be prompted by pressing the "email" button, which includes all of the email addresses in the selected region.
 
-```markdown
-Syntax highlighted code block
+The ArcGIS API uses lots of dojo, which is a JS framework, and something I was not at all familiar with. In this application we require the following libraries.
 
-# Header 1
-## Header 2
-### Header 3
+```Javascript
+dojo.require("esri.map");
+dojo.require("esri.toolbars.draw");
+dojo.require("esri.tasks.query");
+dojo.require("esri.graphic");
+dojo.require("esri.geometry.Point");
+dojo.require("esri.InfoTemplate");
+dojo.require("esri.symbols.SimpleMarkerSymbol");
+dojo.require("esri.renderers.SimpleRenderer");
+```
+```dojo.require``` is a way for us to load in relevant scripts.
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+### Formatting
+Notice how the selected points are highlighted? This is to show the user which points have been selected by their drawn area. In order to 
+```Javascript
+//initialize points - HortNZ colours to be consistent with brand standards
+defaultSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([140,198,63])).setSize(10);
+highlightSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([230,255,160])).setSize(10);
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+### Email
+The email message is easily set up from the results of each plot point in the selected region. To do this you need to configure the 
+```Javascript
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/maxpolaczuk/Open-HortNZ/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+```
 
-### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+## Stage 2: As an iPart
+The next step is to use real data from iMIS, live and in real-time. For this task we require our database to become a geoDB. I'm also going to build this in an *.ascx* controller script, rather than a complete iPart. The script will have both **C#** and **Javascript** script tags, so that we can work with the ArcGIS API in Javascript.
+
+### Geocoding
+To create a geoDB we geocode all of the addresses in iMIS from the **address** table, to create a **geolocation** table, which we are going to import back into iMIS.
+For this task we use the **google maps API**. Since we only need to do this once, I use python for the script along with the **geocoder** library. Unfortunately the API only allows 2500 free requests per day, since there are more than that in our database, we run this on batches over multiple days. The imports look like this:
+
+```Python
+import geocoder as g
+import pandas as pd
+```
+
+### The hard part - connecting C# and Javascript
+Unfortunately there is a flaw in using both **C#** and **JS** - which is variable sharing. Since the data is pulled from a secure connection, we can only use a protected class. But we need to pass the array of growers from the server side through to the javascript on the client side, which isn't straightforward to do from a protected class.
+
+The **C#** code uses the Asi.Data.Dataserver object to connect to the database.
+```C#
+Asi.Data.DataServer dserver = new Asi.Data.DataServer(Asi.iBO.iboAdmin.ConnectionString);
+```
+
+While there is almost certainly a better way to do this, what I have done is save the array in a hidden ```<p>``` tag in **C#**, then read it to an array with javascript. 
+
+Firstly, we need the query results. This is a straightforward **SQL** query (query not exactly the same):
+```SQL
+SELECT Latitude,Longitude,Company,Email FROM Name 
+INNER JOIN Geolocation 
+ON Name.Address_Number = Geolocation.Address_Number
+WHERE Email != ''
+AND Status = 'A';
+```
+
+
+
+### Integrating with iMIS dashboards / pages
+Once the .ascx file has been created, it is easy to import into an iMIS page in RiSE. 
