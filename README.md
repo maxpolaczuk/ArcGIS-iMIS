@@ -2,7 +2,7 @@
 
 This iPart uses the ArcGIS Javascript API to initiate an email to a selected region of contacts on an interactive map.
 
-![GEOLOCATION](https://media.giphy.com/media/xUA7aVDcAMWYZoKHEQ/giphy.gif)
+![GEOLOCATION](https://media.giphy.com/media/3oKIP7CAwnFQyrFPLG/giphy.gif)
 
 ## Purpose
 This tool was created to easily contact groups of growers by email for targeted communications. This provides custom access to growers, on demand.
