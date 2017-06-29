@@ -55,8 +55,8 @@ import pandas as pd
 {% endhighlight %}
 
 
-### The hard part - connecting C# and Javascript
-Unfortunately there is a flaw in using both **C#** and **JS** - which is variable sharing. Since the data is pulled from a secure connection, we can only use a protected class. But we need to pass the array of growers from the server side through to the javascript on the client side, which isn't straightforward to do from a protected class.
+### Connecting C# and Javascript
+Unfortunately there is a flaw in using both **C#** and **JS** - which is array sharing. Since the data is pulled from a secure connection, we can only use a protected class. But we need to pass the array of growers from the server side through to the javascript on the client side, which isn't that straightforward to do.
 
 The **C#** code uses the Asi.Data.Dataserver object to connect to the database.
 
@@ -64,10 +64,9 @@ The **C#** code uses the Asi.Data.Dataserver object to connect to the database.
 Asi.Data.DataServer dserver = new Asi.Data.DataServer(Asi.iBO.iboAdmin.ConnectionString);
 {% endhighlight %}
 
-
 While there is almost certainly a better way to do this, what I have done is save the array in a hidden ```<p>``` tag in **C#**, then read it to an array with javascript. 
 
-Firstly, we need the query results. This is a straightforward **SQL** query (query not exactly the same):
+To do this, we first need the query results. This is a straightforward **SQL** query which should look something like (query not exactly the same):
 
 {% highlight sql %}
 SELECT Latitude,Longitude,Company,Email FROM Name 
@@ -77,6 +76,24 @@ WHERE Email != ''
 AND Status = 'A';
 {% endhighlight %}
 
-
 ### Integrating with iMIS dashboards / pages
+Since our .ascx file is implanted into the body field, and our 
+We make another script tag to "inject" html, css and javascript into the head of the webpage.
+{% highlight javascript %}
+function loadCSS(filename) {
+        var file = document.createElement("link");
+        file.setAttribute("rel", "stylesheet");
+        file.setAttribute("type", "text/css");
+        file.setAttribute("href", filename);
+        document.head.appendChild(file);
+}
+//load the new CSS
+loadCSS("https://js.arcgis.com/3.20/dijit/themes/claro/claro.css");
+loadCSS("https://js.arcgis.com/3.20/esri/css/esri.css");
+
+// add the body class to be claro for mapping
+document.getElementsByTagName("body")[0].class = "claro";
+document.getElementsByTagName("body")[0].onload = "updateVariables()";
+{% endhighlight %}
+
 Once the .ascx file has been created, it is easy to import into an iMIS page in RiSE. 
