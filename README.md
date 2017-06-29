@@ -12,8 +12,8 @@ The first iteration is a standalone HTML page that plots given coordinates, and 
 
 The ArcGIS API uses lots of dojo, which is a JS framework, and something I was not at all familiar with. In this application we require the following libraries.
 
-```Javascript
 {% highlight javascript %}
+```Javascript
 dojo.require("esri.map");
 dojo.require("esri.toolbars.draw");
 dojo.require("esri.tasks.query");
@@ -22,8 +22,8 @@ dojo.require("esri.geometry.Point");
 dojo.require("esri.InfoTemplate");
 dojo.require("esri.symbols.SimpleMarkerSymbol");
 dojo.require("esri.renderers.SimpleRenderer");
-{% endhighlight %}
 ```
+{% endhighlight %}
 ```dojo.require``` is a way for us to load in relevant scripts.
 
 ### Formatting
