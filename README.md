@@ -71,7 +71,5 @@ WHERE Email != ''
 AND Status = 'A';
 ```
 
-
-
 ### Integrating with iMIS dashboards / pages
 Once the .ascx file has been created, it is easy to import into an iMIS page in RiSE. 
