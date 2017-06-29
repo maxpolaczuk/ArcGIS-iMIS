@@ -13,6 +13,7 @@ The first iteration is a standalone HTML page that plots given coordinates, and 
 The ArcGIS API uses lots of dojo, which is a JS framework, and something I was not at all familiar with. In this application we require the following libraries.
 
 {% highlight javascript %}
+// Javascript
 dojo.require("esri.map");
 dojo.require("esri.toolbars.draw");
 dojo.require("esri.tasks.query");
@@ -29,6 +30,7 @@ dojo.require("esri.renderers.SimpleRenderer");
 Notice how the selected points are highlighted? This is to show the user which points have been selected by their drawn area. In order to 
 
 {% highlight javascript %}
+// Javascript
 //initialize points - HortNZ colours to be consistent with brand standards
 defaultSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([140,198,63])).setSize(10);
 highlightSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([230,255,160])).setSize(10);
@@ -50,6 +52,7 @@ To create a geoDB we geocode all of the addresses in iMIS from the **address** t
 For this task we use the **google maps API**. Since we only need to do this once, I use python for the script along with the **geocoder** library. Unfortunately the API only allows 2500 free requests per day, since there are more than that in our database, we run this on batches over multiple days. The imports look like this:
 
 {% highlight python %}
+# Python
 import geocoder as g
 import pandas as pd
 
@@ -64,6 +67,7 @@ Unfortunately there is a flaw in using both **C#** and **JS** - which is array s
 The **C#** code uses the Asi.Data.Dataserver object to connect to the database.
 
 {% highlight c# %}
+// C#
 protected override void OnLoad(EventArgs e) {
 
     Asi.Data.DataServer dserver = new Asi.Data.DataServer(Asi.iBO.iboAdmin.ConnectionString);
@@ -88,6 +92,7 @@ While there is almost certainly a better way to do this, what I have done is sav
 To do this, we first need the query results. This is a straightforward **SQL** query which should look something like (query not exactly the same):
 
 {% highlight sql %}
+-- SQL
 SELECT Latitude,Longitude,Company,Email FROM Name 
 INNER JOIN Geolocation 
 ON Name.Address_Number = Geolocation.Address_Number
@@ -99,6 +104,7 @@ AND Status = 'A';
 Since our .ascx file is implanted into the body field, and our 
 We make another script tag to "inject" html, css and javascript into the head of the webpage.
 {% highlight javascript %}
+// Javascript
 function loadCSS(filename) {
         var file = document.createElement("link");
         file.setAttribute("rel", "stylesheet");
