@@ -52,6 +52,9 @@ For this task we use the **google maps API**. Since we only need to do this once
 {% highlight python %}
 import geocoder as g
 import pandas as pd
+
+# geocode addresses:
+
 {% endhighlight %}
 
 
@@ -61,7 +64,23 @@ Unfortunately there is a flaw in using both **C#** and **JS** - which is array s
 The **C#** code uses the Asi.Data.Dataserver object to connect to the database.
 
 {% highlight c# %}
-Asi.Data.DataServer dserver = new Asi.Data.DataServer(Asi.iBO.iboAdmin.ConnectionString);
+protected override void OnLoad(EventArgs e) {
+
+    Asi.Data.DataServer dserver = new Asi.Data.DataServer(Asi.iBO.iboAdmin.ConnectionString);
+    string query = "select company,email from NAME where status = 'A' and email != ''";
+    System.Data.SqlClient.SqlDataReader reader = dserver.ExecuteReader(System.Data.CommandType.Text, query);
+    if (reader.HasRows)
+    {
+        // temporary data string
+        string dat = "";
+        while(reader.Read()) 
+        {
+           dat = dat + "," +  reader["email"] as string;
+     	}
+        reader.Close();
+        data.Text = dat;
+    }
+}
 {% endhighlight %}
 
 While there is almost certainly a better way to do this, what I have done is save the array in a hidden ```<p>``` tag in **C#**, then read it to an array with javascript. 
